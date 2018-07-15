@@ -2,53 +2,67 @@
 ********************* Módulo Watson.js
 */
 
-//Creedenciales para el uso de watson
-var NaturalLanguageUnderstandingV1 = require('watson-developer-cloud/natural-language-understanding/v1.js');
-var natural_language_understanding = new NaturalLanguageUnderstandingV1({
-  'username': "b8773c63-2d40-4449-96eb-5b077028323c",
-  'password': "8a7Wr1i6VGEs",
-  'version': '2018-03-16'
-});
-var keywords;
+
+
+var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
+var speechToText = new SpeechToTextV1({
+    username: '8aa50bb8-f818-4dde-9aba-9d0a6ace546e',
+    password: '6bp6VmyorxPj'
+  });
+var fs = require('fs');
+
+
+// Display events on the console.
+function onEvent(name, event) {
+    console.log(name, JSON.stringify(event, null, 2));
+};
+
 
 /*
 Descripcion: llamada a la api de watson con los parametros de entidades, 
 palabras clave y semantica de la frase (verbos, sujetos, objectos directos...)
 */
-function getKeyWatson(conversation){
-    var parameters = {
-  'text': conversation,
-  'features': {
-    'entities': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2
-    },
-    'keywords': {
-      'emotion': true,
-      'sentiment': true,
-      'limit': 2
-    },
-    'semantic_roles': {}
-  }
-}
-natural_language_understanding.analyze(parameters, function(err, response) {
-  if (err){
-    console.log('error:', "watson no ha reconocido el texto");
-      keywords = undefined;
-  }
-  else{
-      keywords = response;
-  }
-});
-   
+function getKeyWatson(file){
+    console.log("in getKeyWatson");
+    var params = {
+        objectMode: true,
+        'content_type': 'audio/ogg',
+        model: 'es-ES_BroadbandModel',
+        keywords: ['hola', 'variables', 'respuestas'],
+        'keywords_threshold': 0.5,
+        'max_alternatives': 3
+    };
+
+    // Create the stream.
+    var recognizeStream = speechToText.createRecognizeStream(params);
+
+    // Pipe in the audio.
+    fs.createReadStream(file).pipe(recognizeStream);
+
+    /*
+     * Uncomment the following two lines of code ONLY if `objectMode` is `false`.
+     *
+     * WHEN USED TOGETHER, the two lines pipe the final transcript to the named
+     * file and produce it on the console.
+     *
+     * WHEN USED ALONE, the following line pipes just the final transcript to
+     * the named file but produces numeric values rather than strings on the
+     * console.
+     */
+    // recognizeStream.pipe(fs.createWriteStream('transcription.txt'));
+
+    /*
+     * WHEN USED ALONE, the following line produces just the final transcript
+     * on the console.
+     */
+    // recognizeStream.setEncoding('utf8');
+
+    // Listen for events.
+    recognizeStream.on('data', function(event) { onEvent('Data:', event); });
+    recognizeStream.on('error', function(event) { onEvent('Error:', event); });
+    recognizeStream.on('close', function(event) { onEvent('Close:', event); });
+
+
 }
 
-function getKeys(){
-    //console.log(keywords);
-    return keywords;
-}
-
-exports.getKeys=getKeys;
-exports.keywords=keywords;
 exports.getKeyWatson=getKeyWatson;
