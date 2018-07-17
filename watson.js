@@ -10,14 +10,27 @@ var speechToText = new SpeechToTextV1({
     password: '6bp6VmyorxPj'
   });
 var fs = require('fs');
-
+var resultado;
+var transcripciones;
 
 // Display events on the console.
 function onEvent(name, event) {
+    //console.log(event);
     console.log(name, JSON.stringify(event, null, 2));
 };
 
+function showResultado(){
+    console.log(resultado.results);
+    transcripciones = resultado.results[0].alternatives;
+    for(i = 0; i < transcripciones.length; i++){
+        var indice = i + 1;
+        console.log("Transcripción número "+indice + ": "+transcripciones[i].transcript);
+    }
+}
 
+function getTranscripciones(){
+    return transcripciones;
+}
 /*
 Descripcion: llamada a la api de watson con los parametros de entidades, 
 palabras clave y semantica de la frase (verbos, sujetos, objectos directos...)
@@ -58,7 +71,7 @@ function getKeyWatson(file){
     // recognizeStream.setEncoding('utf8');
 
     // Listen for events.
-    recognizeStream.on('data', function(event) { onEvent('Data:', event); });
+    recognizeStream.on('data', function(event) { resultado = event; showResultado();});
     recognizeStream.on('error', function(event) { onEvent('Error:', event); });
     recognizeStream.on('close', function(event) { onEvent('Close:', event); });
 
@@ -66,3 +79,4 @@ function getKeyWatson(file){
 }
 
 exports.getKeyWatson=getKeyWatson;
+exports.getTranscripciones=getTranscripciones;

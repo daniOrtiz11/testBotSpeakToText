@@ -16,7 +16,9 @@ const bot = new TeleBot({
     pluginConfig: {
         // Plugin configs
     }
+
 });
+var transcripciones;
 
 function parserMessages(){
     bot.on('voice', (data, voice) => {
@@ -37,6 +39,9 @@ function parserMessages(){
             dw(file_path, options, function(err){
                 if (err) throw err
                 watson.getKeyWatson(file_name);
+                setTimeout(function(){
+                    transcripciones = watson.getTranscripciones(); console.log(transcripciones); sendTranscripciones();
+                }, 4000);
             }); 
             //watson.getKeyWatson(file_name);
         });
@@ -44,6 +49,9 @@ function parserMessages(){
     });
 }
 
+function sendTranscripciones(){
+    bot.sendMessage(id, "Quizá has dicho algo como esto: \n"+transcripciones[0].transcript);
+}
 function init(){
     parserMessages();
     bot.start();
