@@ -38,10 +38,12 @@ function parserMessages(){
             }
             dw(file_path, options, function(err){
                 if (err) throw err
-                watson.getKeyWatson(file_name);
+                setTimeout(function(){
+                    watson.getKeyWatson(file_name);
+                }, 500);
                 setTimeout(function(){
                     transcripciones = watson.getTranscripciones(); console.log(transcripciones); sendTranscripciones();
-                }, 4000);
+                }, 4800);
             }); 
             //watson.getKeyWatson(file_name);
         });
