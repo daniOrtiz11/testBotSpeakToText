@@ -10,7 +10,7 @@ var speechToText = new SpeechToTextV1({
     password: '6bp6VmyorxPj'
   });
 var fs = require('fs');
-var resultado;
+var resultado = new Object();
 var transcripciones;
 
 // Display events on the console.
@@ -21,11 +21,14 @@ function onEvent(name, event) {
 
 function showResultado(){
     console.log(resultado.results);
-    transcripciones = resultado.results[0].alternatives;
-    for(i = 0; i < transcripciones.length; i++){
-        var indice = i + 1;
-        console.log("Transcripción número "+indice + ": "+transcripciones[i].transcript);
+    if(resultado.length > 0 && resultado.results[0].hasOwnProperty("alternatives")){
+        transcripciones = resultado.results[0].alternatives;
+        for(i = 0; i < transcripciones.length; i++){
+            var indice = i + 1;
+            console.log("Transcripción número "+indice + ": "+transcripciones[i].transcript);
+        }
     }
+
 }
 
 function getTranscripciones(){

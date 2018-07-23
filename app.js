@@ -18,7 +18,7 @@ const bot = new TeleBot({
     }
 
 });
-var transcripciones;
+var transcripciones = new Object();
 
 function parserMessages(){
     bot.on('voice', (data, voice) => {
@@ -52,7 +52,10 @@ function parserMessages(){
 }
 
 function sendTranscripciones(){
-    bot.sendMessage(id, "Quizá has dicho algo como esto: \n"+transcripciones[0].transcript);
+    if(transcripciones == undefined ||  transcripciones == null)
+        bot.sendMessage(id, "No te he entendido bien, podrías repetirlo?");
+    else
+       bot.sendMessage(id, "Quizá has dicho algo como esto: \n"+transcripciones[0].transcript); 
 }
 function init(){
     parserMessages();
