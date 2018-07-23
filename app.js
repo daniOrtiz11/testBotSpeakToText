@@ -21,6 +21,7 @@ const bot = new TeleBot({
 var transcripciones = new Object();
 
 function parserMessages(){
+    
     bot.on('voice', (data, voice) => {
         console.log(voice);
         id = data.from.id;
@@ -42,7 +43,12 @@ function parserMessages(){
                     watson.getKeyWatson(file_name);
                 }, 500);
                 setTimeout(function(){
-                    transcripciones = watson.getTranscripciones(); console.log(transcripciones); sendTranscripciones();
+                    transcripciones = watson.getTranscripciones(); 
+                    console.log(transcripciones); 
+                    if(transcripciones != undefined)
+                        sendTranscripciones();
+                    else
+                        bot.sendMessage(id, "No te he entendido bien, podrías repetirlo?");
                 }, 4800);
             }); 
             //watson.getKeyWatson(file_name);
@@ -52,10 +58,7 @@ function parserMessages(){
 }
 
 function sendTranscripciones(){
-    if(transcripciones == undefined ||  transcripciones == null)
-        bot.sendMessage(id, "No te he entendido bien, podrías repetirlo?");
-    else
-       bot.sendMessage(id, "Quizá has dicho algo como esto: \n"+transcripciones[0].transcript); 
+    bot.sendMessage(id, "Quizá has dicho algo como esto: \n"+transcripciones[0].transcript); 
 }
 function init(){
     parserMessages();
